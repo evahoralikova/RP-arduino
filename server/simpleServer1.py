@@ -18,6 +18,7 @@ class myHandler(BaseHTTPRequestHandler):
 		return
 		
 	#Handler for the POST requests
+	# test command in Git Bash: curl -v -X POST --data 'temperature=17' http://localhost:8000/addtemp
 	def do_POST(self):
 		if self.path=="/addtemp":
 			form = cgi.FieldStorage(
