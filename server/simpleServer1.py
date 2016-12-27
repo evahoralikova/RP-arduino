@@ -1,5 +1,6 @@
 #!/usr/bin/python
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
+import cgi
 
 PORT_NUMBER = 8000
 
@@ -15,6 +16,23 @@ class myHandler(BaseHTTPRequestHandler):
 		# Send the html message
 		self.wfile.write("<h1>Hello World !</h1>")
 		return
+		
+	#Handler for the POST requests
+	def do_POST(self):
+		if self.path=="/send":
+			form = cgi.FieldStorage(
+				fp=self.rfile, 
+				headers=self.headers,
+				environ={'REQUEST_METHOD':'POST',
+		                 'CONTENT_TYPE':self.headers['Content-Type'],
+			})
+
+			print "Your name is: %s" % form["temperature"].value
+			self.send_response(200)
+			self.end_headers()
+			#self.wfile.write("Thanks!")
+			self.wfile.write("Thanks %s !" % form["temperature"].value)
+			return	
 
 try:
 	#Create a web server and define the handler to manage the
