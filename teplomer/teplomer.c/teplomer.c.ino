@@ -1,4 +1,7 @@
-//POPIS:senzor ze základní sady,vodic na pin A0, cerveny na 5V, cerny na zem, otestovano i venku, vodice prodlouzene 2x z dht11 + spojeni tvori kratke vodice ze zakladni sady
+#include <SPI.h>
+#include <SD.h>
+
+File myFile;
 
 
 // named constant for the pin the sensor is connected to
@@ -11,6 +14,14 @@ void setup() {
   Serial.begin(9600);
   // set the LED pins as outputs
   // the for() loop saves some extra coding
+  Serial.print("Initializing SD card...");
+
+  if (!SD.begin(4)) {
+    Serial.println("initialization failed!");
+    return;
+  }
+  Serial.println("initialization done.");
+  myFile = SD.open("teploty.csv", FILE_WRITE);
  
 }
 
