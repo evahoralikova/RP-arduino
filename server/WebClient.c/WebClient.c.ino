@@ -32,6 +32,8 @@ void setup() {
     Serial.println("Failed to configure Ethernet using DHCP");
     // try to congifure using IP address instead of DHCP:
     Ethernet.begin(mac, ip);
+  }else{
+    Serial.println("error setting mac");
   }
   // give the Ethernet shield a second to initialize:
   delay(1000);
@@ -49,16 +51,17 @@ void setup() {
   if (client.connect(server, 80)) {
     Serial.println("connected");
     // Make a HTTP request:
-    /*client.println("POST /post-temperature.php HTTP/1.1");
-    client.println("Host: 35.163.23.102");
-    client.println("Accept: *´=/*");
+    client.println("POST /post-temperature.php HTTP/1.1");
+    client.println("Host: ec2-35-163-23-102.us-west-2.compute.amazonaws.com");
+    client.println("Accept: */*");
     client.println("Content-Length: 7");
     client.println("Content-Type: application/x-www-form-urlencoded");
-    client.println("temp=23");*/
-    client.println("GET /view-temperatures.php HTTP/1.1");
+    client.println();
+    client.println("temp=23");
+    /*client.println("GET /view-temperatures.php HTTP/1.1");
     client.println("Host: ec2-35-163-23-102.us-west-2.compute.amazonaws.com");
     client.println("User-Agent: curl/7.50.3");
-    client.println("Accept: */*");
+    client.println("Accept: *-/*");*/
     client.println("Connection: close");
     client.println();
   } else {
