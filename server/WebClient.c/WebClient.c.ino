@@ -1,10 +1,6 @@
 #include <SPI.h>
 #include <Ethernet.h>
 
-
-
-
-
 // named constant for the pin the sensor is connected to
 const int sensorPin = A0;
 // room temperature in Celcius
@@ -28,20 +24,6 @@ IPAddress ip(192, 168, 0, 177);
 // that you want to connect to (port 80 is default for HTTP):
 EthernetClient client;
 
-char *ftoa(char *a, double f, int precision)
-{
- long p[] = {0,10,100,1000,10000,100000,1000000,10000000,100000000};
- 
- char *ret = a;
- long heiltal = (long)f;
- itoa(heiltal, a, 10);
- while (*a != '\0') a++;
- *a++ = '.';
- long desimal = abs((long)((f - heiltal) * p[precision]));
- itoa(desimal, a, 10);
- return ret;
-}
-
 void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
@@ -49,7 +31,11 @@ void setup() {
     ; // wait for serial port to connect. Needed for native USB port only
   }
   Serial.println("1");
-   int sensorVal = analogRead(sensorPin);
+}
+
+void loop() {
+
+  int sensorVal = analogRead(sensorPin);
 
   // send the 10-bit sensor value out the serial port
   Serial.print("sensor Value: ");
@@ -72,7 +58,7 @@ void setup() {
   char tempStr[2];
   itoa(temperature, tempStr,10);
   Serial.println(tempStr);
-  
+
   // start the Ethernet connection:
   if (Ethernet.begin(mac) == 0) {
     Serial.println("Failed to configure Ethernet using DHCP");
@@ -116,9 +102,8 @@ void setup() {
     // if you didn't get a connection to the server:
     Serial.println("connection failed");
   }
-}
 
-void loop() {
+
   // if there are incoming bytes available
   // from the server, read them and print them:
   if (client.available()) {
@@ -126,14 +111,20 @@ void loop() {
     Serial.print(c);
   }
 
-  // if the server's disconnected, stop the client:
-  if (!client.connected()) {
-    Serial.println();
-    Serial.println("disconnecting.");
+  Serial.println("disconnecting.");
+  client.stop();
+    
+  /*// if the server's disconnected, stop the client:
+  //if (!client.connected()) {
+    //Serial.println();
+    Serial.println("disconnected.");
     client.stop();
 
     // do nothing forevermore:
-    while (true);
+    //while (true);
+  }*/
+  for(int i=0;i<60;i++){
+    delay(1000);
   }
 }
 
