@@ -1,14 +1,23 @@
 #include <SPI.h>
 #include <Ethernet.h>
 
-// named constant for the pin the sensor is connected to
-const int sensorPin = A0;
-// room temperature in Celcius
-const float baselineTemp = 20.0;
+
+// připojení knihovny DHT
+#include "DHT.h"
+// nastavení čísla pinu s připojeným DHT senzorem
+#define pinDHT 5
+
+// odkomentování správného typu čidla
+#define typDHT11 DHT11     // DHT 11
+//#define typDHT22 DHT22   // DHT 22 (AM2302)
+
+// inicializace DHT senzoru s nastaveným pinem a typem senzoru
+DHT mojeDHT(pinDHT, typDHT11);
+
 
 // Enter a MAC address for your controller below.
 // Newer Ethernet shields have a MAC address printed on a sticker on the shield
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xDE };
 // if you don't want to use DNS (and reduce your sketch size)
 // use the numeric IP instead of the name for the server:
 IPAddress server(35,163,23,102);  // numeric IP for Google (no DNS)
@@ -31,33 +40,45 @@ void setup() {
     ; // wait for serial port to connect. Needed for native USB port only
   }
   Serial.println("1");
+
+  
+  // zapnutí komunikace s teploměrem DHT
+  mojeDHT.begin();
 }
 
 void loop() {
+  
+  // pomocí funkcí readTemperature a readHumidity načteme
+  // do proměnných tep a vlh informace o teplotě a vlhkosti,
+  // čtení trvá cca 250 ms
+  float tep = mojeDHT.readTemperature();
+  float vlh = mojeDHT.readHumidity();
+  // kontrola, jestli jsou načtené hodnoty čísla pomocí funkce isnan
+  Serial.println(tep);
+  Serial.println(vlh);
+  if (isnan(tep) || isnan(vlh)) {
+    // při chybném čtení vypiš hlášku
+    Serial.println("Chyba při čtení z DHT senzoru!");
+  } else {
+    // pokud jsou hodnoty v pořádku,
+    // vypiš je po sériové lince
+    Serial.print("Teplota: "); 
+    Serial.print(tep);
+    Serial.print(" stupnu Celsia, ");
+    Serial.print("vlhkost: "); 
+    Serial.print(vlh);
+    Serial.println("  %");
+  }
+  
+  char tempStr[6];
+  //itoa(temperature, tempStr,10);
+  dtostrf(tep,6,2,tempStr);
+  Serial.println(tep);
 
-  int sensorVal = analogRead(sensorPin);
-
-  // send the 10-bit sensor value out the serial port
-  Serial.print("sensor Value: ");
-  Serial.print(sensorVal);
-
-  // convert the ADC reading to voltage
-  float voltage = (sensorVal / 1024.0) * 5.0;
-
-  // Send the voltage level out the Serial port
-  Serial.print(", Volts: ");
-  Serial.print(voltage);
-
-  // convert the voltage to temperature in degrees C
-  // the sensor changes 10 mV per degree
-  // the datasheet says there's a 500 mV offset
-  // ((volatge - 500mV) times 100)
-  Serial.print(", degrees C: ");
-  float temperature = (voltage - .5)  * 100;
-  Serial.println(temperature);
-  char tempStr[2];
-  itoa(temperature, tempStr,10);
-  Serial.println(tempStr);
+    char vlhStr[6];
+  //itoa(temperature, tempStr,10);
+  dtostrf(vlh,6,2,vlhStr);
+  Serial.println(vlh);
 
   // start the Ethernet connection:
   if (Ethernet.begin(mac) == 0) {
@@ -87,16 +108,18 @@ void loop() {
     client.println("Host: ec2-35-163-23-102.us-west-2.compute.amazonaws.com");
     client.println("Accept: */*");
     client.println("Content-Type: application/x-www-form-urlencoded");
-    client.print("Content-Length: ");
-    client.println("7");
+    client.print("Content-Length: 15 ");
+    client.println("");
     client.println();
     client.print("temp=");
-    client.println(tempStr);
+    client.print(tempStr );
+    client.print("vlh=");
+    client.println(vlhStr);
     /*client.println("GET /view-temperatures.php HTTP/1.1");
     client.println("Host: ec2-35-163-23-102.us-west-2.compute.amazonaws.com");
     client.println("User-Agent: curl/7.50.3");
     client.println("Accept: *-/*");*/
-    client.println("Connection: close");
+   // client.println("Connection: close");
     client.println();
   } else {
     // if you didn't get a connection to the server:
@@ -123,7 +146,7 @@ void loop() {
     // do nothing forevermore:
     //while (true);
   }*/
-  for(int i=0;i<60;i++){
+  for(int i=0;i<60*5;i++){
     delay(1000);
   }
 }
