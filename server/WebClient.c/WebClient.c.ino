@@ -70,15 +70,16 @@ void loop() {
     Serial.println("  %");
   }
   
-  char tempStr[6];
-  //itoa(temperature, tempStr,10);
-  dtostrf(tep,6,2,tempStr);
-  Serial.println(tep);
-
-    char vlhStr[6];
+  /*  char vlhStr[6];
   //itoa(temperature, tempStr,10);
   dtostrf(vlh,6,2,vlhStr);
   Serial.println(vlh);
+
+  char tempStr[6];
+  //itoa(temperature, tempStr,10);
+  dtostrf(tep,6,2,tempStr);
+  Serial.println("teplota1");
+  Serial.println(tempStr); */
 
   // start the Ethernet connection:
   if (Ethernet.begin(mac) == 0) {
@@ -107,14 +108,30 @@ void loop() {
     client.println("POST /post-temperature.php HTTP/1.1");
     client.println("Host: ec2-35-163-23-102.us-west-2.compute.amazonaws.com");
     client.println("Accept: */*");
-    client.println("Content-Type: application/x-www-form-urlencoded");
+    //client.println("Content-Type: application/x-www-form-urlencoded");
+    client.println("Content-Type: text/plain");
     client.print("Content-Length: 15 ");
     client.println("");
     client.println();
-    client.print("temp=");
+    char message[80];
+    char hodnotaStr[10];
+    dtostrf(tep,6,2,hodnotaStr);
+    Serial.println("teplota2");
+    Serial.println(hodnotaStr);
+    strcpy(message, hodnotaStr);
+    strcat(message, ",");
+    dtostrf(vlh,6,2,hodnotaStr);
+    Serial.println("vlhkost2");
+    Serial.println(hodnotaStr);
+    strcat(message, hodnotaStr);
+    Serial.println(message);
+    client.println(message);
+    
+    
+    /*client.print("temp=");
     client.print(tempStr );
     client.print("vlh=");
-    client.println(vlhStr);
+    client.println(vlhStr);*/
     /*client.println("GET /view-temperatures.php HTTP/1.1");
     client.println("Host: ec2-35-163-23-102.us-west-2.compute.amazonaws.com");
     client.println("User-Agent: curl/7.50.3");
@@ -142,11 +159,11 @@ void loop() {
     //Serial.println();
     Serial.println("disconnected.");
     client.stop();
-
     // do nothing forevermore:
     //while (true);
   }*/
-  for(int i=0;i<60*5;i++){
+  for(int i=0;i<60*5
+  ;i++){
     delay(1000);
   }
 }
