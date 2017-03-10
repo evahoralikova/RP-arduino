@@ -9,6 +9,7 @@ const int sensorPin = A0;
 // room temperature in Celcius
 const float baselineTemp = 20.0;
 
+
 void setup() {
   // open a serial connection to display values
   Serial.begin(9600);
