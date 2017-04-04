@@ -1,4 +1,11 @@
-teploty=[10,14,10,15,11,11,22,12,12,17,13]
+teploty=[]
+file = open("vstup.csv", "r")
+file.readline()
+for line in file:
+    novaTeplota=line.split(",")[1]
+    print(novaTeplota)
+    novaTeplotaInt=int(novaTeplota)
+    teploty.append(novaTeplotaInt)
 filtrovane=[]
 delkaHistorie=8
 historie=[]
@@ -7,7 +14,7 @@ for n in range(0,delkaHistorie):
 print (teploty)
 for aktualni in teploty:
   print (historie)
-  prumer=sum(historie)/delkaHistorie
+  prumer=sum(historie)/float(delkaHistorie)
   print(prumer)
   if (aktualni-prumer<2):
     filtrovane.append(aktualni)
@@ -15,3 +22,10 @@ for aktualni in teploty:
     historie[n]=historie[n+1]
   historie[delkaHistorie-1]=aktualni
 print(filtrovane)
+f = open('vystup.csv', 'wb')
+f.write("teplota")
+f.write("\r\n")
+for teplota in filtrovane:
+  f.write(str(teplota))
+  f.write("\r\n")
+f.close()
